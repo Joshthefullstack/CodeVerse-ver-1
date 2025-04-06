@@ -1,17 +1,17 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-// import pool from './config/dbConfig';
+import pool from './dbConfig/index';
 
 const app = express();
 dotenv.config();
 
 
-// pool.connect((err, client, done) => {
-//   if (err) console.error(err);
-//   else console.log("Connected to database");
-//   done();
-// });
+pool.connect((err, client, done) => {
+  if (err) console.error(err);
+  else console.log("Connected to database");
+  done();
+});
 
 
 app.use(cors());
