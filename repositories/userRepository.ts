@@ -27,6 +27,7 @@ export class UserRepository implements IUserRepository {
             `INSERT INTO ${TABLES.USERS} (email, password_hash) VALUES ($1,$2) RETURNING *`,
             [email, password_hash]
         );
+        
         return userRet.rows[0];    
     }
 

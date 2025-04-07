@@ -1,7 +1,7 @@
-import { UserStatus } from "../utils/enums/UserStatus";
 
 export class User{
     constructor(
+        public readonly user_id : number,
         public readonly username: string,
         public readonly email: string,
         public readonly password_hash: string,
