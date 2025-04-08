@@ -1,5 +1,6 @@
 import { User } from "../entities/User";
-import { hashPassword } from "../external-libs/passwordHashing";
+import { sendOtp } from "../external-libs/emailHandling";
+import { hashPassword } from "../external-libs/passwordHandling";
 import { IUserRepository } from "../interfaces/user/IUserRepository";
 import { IUserService } from "../interfaces/user/IUserService";
 import { UserStatus } from "../utils/enums/UserStatus";
@@ -33,8 +34,13 @@ export class UserService implements IUserService{
         }
 
         const password_hash = await hashPassword(user.password_hash);
+        sendOtp(user.email);
+        // i need to tell the user to verify their email on the frontend, so I might need to run sendOtp on 
+        // the controller
 
-        // done validation, now to verify email after registration
+        // expose verify otp to frontend
+        
+        // done validation, now to verify email after registration - done
         // also, I would need to handle JWT sessions too.
         // i also need to hash my passwords here too - done
         throw new Error("Method not implemented.");
