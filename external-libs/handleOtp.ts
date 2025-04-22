@@ -17,19 +17,19 @@ const transporter = nodemailer.createTransport({
 });
 
 // async..await is not allowed in global scope, must use a wrapper
-async function main() {
-  // send mail with defined transport object
-  const info = await transporter.sendMail({
-    from: '"ibiamjoshua20@gmail.com', // sender address
-    to: "bar@example.com, baz@example.com", // list of receivers
-    subject: "Hello ✔", // Subject line
-    text: "Hello world?", // plain text body
-    html: "<b>Hello world?</b>", // html body
-  });
+// async function main() {
+//   send mail with defined transport object
+//   const info = await transporter.sendMail({
+//     from: '"ibiamjoshua20@gmail.com', // sender address
+//     to: "bar@example.com, baz@example.com", // list of receivers
+//     subject: "Hello ✔", // Subject line
+//     text: "Hello world?", // plain text body
+//     html: "<b>Hello world?</b>", // html body
+//   });
 
-  console.log("Message sent: %s", info.messageId);
-  // Message sent: <d786aa62-4e0a-070a-47ed-0b0666549519@ethereal.email>
-}
+//   console.log("Message sent: %s", info.messageId);
+//   Message sent: <d786aa62-4e0a-070a-47ed-0b0666549519@ethereal.email>
+// }
 
 // main().catch(console.error);
 
@@ -52,7 +52,7 @@ function generateOtp()
     return randomString.generate({ length: 4, charset: 'numeric'});
 }
 
-export function sendOtp(email : string)
+export function sendOtp(email : string) : RespInfo
 {
   const otp = generateOtp();
     const mailOptions = {
@@ -79,11 +79,15 @@ export function sendOtp(email : string)
         if(error)
         {
             console.log('Error occured while sending email: ', error);
+            return new RespInfo(['Error', 'Error occured while sending email: '], false, null);
         } else{
-            saveOtp(email, otp)
+            saveOtp(email, otp);
             console.log('OTP Email sent successfully', info)
+            return new RespInfo(['Success', 'OTP saved successfully: '], false, null);
         }
       })
+
+      return new RespInfo(['Error', 'Error occured while sending email: '], false, null);
 }
 
 export function verifyOtp(email : string, otp : string) : RespInfo

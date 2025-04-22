@@ -12,6 +12,19 @@ export class UserRepository implements IUserRepository {
         this.client = pool
     }
 
+
+    // async login(email: string, password: string): Promise<User> {
+    //     const userRet = await this.client.query(`SELECT * FROM ${TABLES.USERS} WHERE email = $1, password = $2`, 
+    //         [email, password]);
+    //     return userRet.rows[0];
+    // }
+
+
+    async getUser(user_id: number): Promise<User> {
+        const userRet = await this.client.query(`SELECT * FROM ${TABLES.USERS} WHERE user_id = $1`, [user_id]);
+        return userRet.rows[0];
+    }
+
     async updateStatus(status: UserStatus, user_id: number): Promise<User> {
         const userRet = await this.client.query(
             `UPDATE ${TABLES.USERS} SET status=$1 WHERE user_id=$2 RETURNING *`,
@@ -21,11 +34,10 @@ export class UserRepository implements IUserRepository {
     }
     
     
-    async create(user: User): Promise<User> {
-        const { email, password_hash } = user;
+    async create(email: string, password : string): Promise<User> {
         const userRet = await this.client.query(
             `INSERT INTO ${TABLES.USERS} (email, password_hash) VALUES ($1,$2) RETURNING *`,
-            [email, password_hash]
+            [email, password]
         );
         
         return userRet.rows[0];    
