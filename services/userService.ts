@@ -3,6 +3,9 @@ import { hashPassword, verifyPassword } from "../external-libs/passwordHandling"
 import { IUserRepository } from "../interfaces/user/IUserRepository";
 import { IUserService } from "../interfaces/user/IUserService";
 import { UserStatus } from "../utils/enums/UserStatus";
+import { UpdatePasswordReq } from "../utils/requests/user/UpdatePasswordReq";
+import { UpdateStatusReq } from "../utils/requests/user/UpdateStatusReq";
+import { UserRequest } from "../utils/requests/user/userRequests";
 import { RespInfo } from "../utils/RespInfo";
 import { ValidateCreateUser, ValidateUpdateUser } from "../utils/ValHelper/userValHelper";
 
@@ -19,12 +22,12 @@ export class UserService implements IUserService{
     }
 
 
-    async loginUser(email : string, password : string): Promise<RespInfo> {
+    async loginUser(userRequest : UserRequest): Promise<RespInfo> {
         try{
-            const user = await this.repository.findEmail(email);
+            const user = await this.repository.findEmail(userRequest.email);
             if(user == null) return new RespInfo(['Invalid Email', `Invalid email/password`], false, null);
 
-            const validPassword = await verifyPassword(password, user.password_hash);
+            const validPassword = await verifyPassword(userRequest.password_hash, user.password_hash);
             if(validPassword){
                 return new RespInfo([], true, user);
             }
@@ -37,30 +40,41 @@ export class UserService implements IUserService{
     }
 
     async checkUserId(user_id : number) : Promise<RespInfo>{
-        if(user_id < 1)
-        {
-            return new RespInfo(['Invalid User', `This user doesn't exist`], false, null);
+        try{
+            if(user_id < 1)
+            {
+                return new RespInfo(['Invalid User', `This user doesn't exist`], false, null);
+            }
+    
+            const user = await this.repository.getUser(user_id);
+    
+            if(!user){
+                return new RespInfo(['Invalid User', `This user doesn't exist`], false, null);
+            }
+    
+            return new RespInfo([], true, user);
+        } catch(err){
+            console.log(err);
+            return new RespInfo(['Db Error:', 'Unable to get user, please try again'], true, null);
         }
-
-        return new RespInfo([], true, user_id);
     }
 
-    async createUser(user: User): Promise<RespInfo> {
+    async createUser(userRequest : UserRequest): Promise<RespInfo> {
         try{
-            const exisitingUser = await this.repository.findEmail(user.email);
+            const exisitingUser = await this.repository.findEmail(userRequest.email);
             if(exisitingUser)
             {
                 return new RespInfo(['Invalid Email', `This email already exist`], false, null);
             }
 
-            const errors = ValidateCreateUser(user);
+            const errors = ValidateCreateUser(userRequest);
             if(errors.length > 0)
             {
                 return new RespInfo(errors, false, null)
             }
     
-            const hashedPwd = await hashPassword(user.password_hash);
-            const newUser = this.repository.create(user.email, hashedPwd);
+            const hashedPwd = await hashPassword(userRequest.password_hash);
+            const newUser = this.repository.create(userRequest.email, hashedPwd);
             return new RespInfo([], true, newUser);
         } catch(err){
             console.log(err);
@@ -68,16 +82,12 @@ export class UserService implements IUserService{
         }
     }
 
-    async updateStatus(status: UserStatus, user: User): Promise<RespInfo> {
+    async updateStatus(UpdateStatusReq: UpdateStatusReq): Promise<RespInfo> {
         try{
-            const check = await this.checkUserId(user.user_id);
-            if(check.IsValid){
-                user = await this.repository.getUser(user.user_id);
-            } else{
-                return check;
-            }
+            const check = await this.checkUserId(UpdateStatusReq.user_id);
+            if (!check.IsValid) return check;
 
-            const userRet = this.repository.updateStatus(status, user.user_id);
+            const userRet = this.repository.updateStatus(UpdateStatusReq.status, UpdateStatusReq.user_id);
             return new RespInfo([], true, userRet);
         } catch(err){
             console.log(err);
@@ -85,22 +95,18 @@ export class UserService implements IUserService{
         }
     }
 
-    async update(user: User): Promise<RespInfo> {
+    async update(userRequest : UserRequest): Promise<RespInfo> {
         try{
-            const check = await this.checkUserId(user.user_id);
-            if(check.IsValid){
-                user = await this.repository.getUser(user.user_id);
-            } else{
-                return check;
-            }
+            const check = await this.checkUserId(userRequest.user_id);
+            if(!check.IsValid) return check;
             
-            const errors = ValidateUpdateUser(user);
+            const errors = ValidateUpdateUser(userRequest);
             if(errors.length > 0)
             {
                 return new RespInfo(errors, false, null)
             }
     
-            const updatedUser = this.repository.update(user.user_id, user);
+            const updatedUser = this.repository.update(userRequest.user_id, userRequest);
             return new RespInfo([], true, updatedUser);
         } catch(err){
             console.log(err)
@@ -108,17 +114,13 @@ export class UserService implements IUserService{
         }
     }
 
-    async updatePassword(password_hash: string, user: User): Promise<RespInfo> {
+    async updatePassword(updatePasswordReq: UpdatePasswordReq): Promise<RespInfo> {
         try{
-            const check = await this.checkUserId(user.user_id);
-            if(check.IsValid){
-                user = await this.repository.getUser(user.user_id);
-            } else{
-                return check;
-            }
+            const check = await this.checkUserId(updatePasswordReq.user_id);
+            if (!check.IsValid) return check;
 
-            const hashedPwd = await hashPassword(password_hash);
-            const userRet = await this.repository.updatePassword(hashedPwd, user.user_id);
+            const hashedPwd = await hashPassword(updatePasswordReq.password);
+            const userRet = await this.repository.updatePassword(hashedPwd, updatePasswordReq.user_id);
             return new RespInfo([], true, userRet);
         } catch(err){
             console.log(err);

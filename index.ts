@@ -1,6 +1,5 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import cors from 'cors';
 import pool from './dbConfig/index';
 const corsMw = require("./external-libs/cors");
 const redisSession = require("./external-libs/session");
@@ -23,7 +22,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use(redisSession);
-// app.use(router)
+require("./routes")(app);
 
 const PORT = process.env.PORT || 3000;
 

@@ -1,13 +1,16 @@
 import { User } from "../../entities/User";
 import { UserStatus } from "../../utils/enums/UserStatus";
+import { UpdatePasswordReq } from "../../utils/requests/user/UpdatePasswordReq";
+import { UpdateStatusReq } from "../../utils/requests/user/UpdateStatusReq";
+import { UserRequest } from "../../utils/requests/user/userRequests";
 import { RespInfo } from "../../utils/RespInfo";
 
 export interface IUserService{
-    createUser(user: User) : Promise<RespInfo>;
-    updateStatus(status: UserStatus, user: User) : Promise<RespInfo>;
-    update(user: User) : Promise<RespInfo>;
-    updatePassword(password_hash: string, user: User) : Promise<RespInfo>;
-    loginUser(email : string, password : string) : Promise<RespInfo>;
+    createUser(userRequest : UserRequest) : Promise<RespInfo>;
+    updateStatus(UpdateStatusReq: UpdateStatusReq) : Promise<RespInfo>;
+    update(userRequest : UserRequest) : Promise<RespInfo>;
+    updatePassword(updatePasswordReq: UpdatePasswordReq) : Promise<RespInfo>;
+    loginUser(userRequest : UserRequest) : Promise<RespInfo>;
 }
 
 // I need to do a custom success/error response to return here

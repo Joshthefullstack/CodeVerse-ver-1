@@ -90,8 +90,10 @@ export function sendOtp(email : string) : RespInfo
       return new RespInfo(['Error', 'Error occured while sending email: '], false, null);
 }
 
-export function verifyOtp(email : string, otp : string) : RespInfo
+export function verifyOtp(email : string, otp? : string) : RespInfo
 {
+  if(!otp) return new RespInfo(['Verification Unsuccessful','Invalid OTP'], false, null);
+  
     if(!otpCach.has(email))
     {
         return new RespInfo(['Invalid Email', 'Email not found, please input a registered email'], false, null);
@@ -102,6 +104,6 @@ export function verifyOtp(email : string, otp : string) : RespInfo
         otpCach.delete(email);
         return new RespInfo(['Verification Successful, OTP Verified Sucessfully'], true, email);
     } else{
-        return new RespInfo(['Verification UnSuccessful, Invalid OTP'], true, email);
+        return new RespInfo(['Verification UnSuccessful, Invalid OTP'], false, email);
     }
 }
