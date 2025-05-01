@@ -7,6 +7,7 @@ import { sendError, sendSuccess } from "../utils/responseHelper";
 import { UpdatePasswordReq } from "../utils/requests/user/UpdatePasswordReq";
 import { UpdateStatusReq } from "../utils/requests/user/UpdateStatusReq";
 import { SendOtpReq } from "../utils/requests/user/SendOtpReq";
+import { generateToken } from "../external-libs/jwt";
 
 export class UserController {
     private service: IUserService;
@@ -86,12 +87,18 @@ export class UserController {
             }
 
             const retVal = await this.service.loginUser(body);
-            req.session.user = retVal.value;
-            // res.sendStatus(204);
-
+            // req.session.user = retVal.value;
+            
             if (!retVal.IsValid) {
                 return sendError(res, retVal.Errors[0], 400);
             }
+
+            const token = generateToken({ user_id: body.user_id, email: body.email });
+            // res.sendStatus(204);
+
+             // 4. Send it (choose either header or cookie)
+            res.cookie('token', token, { httpOnly: true, secure: false }); // or secure: true in prod
+
 
             return sendSuccess(res, retVal.value, 201);
         }
