@@ -14,9 +14,6 @@ import { NextFunction, Request, Response } from "express";
 
 // middlewares/authMiddleware.ts
 import { verifyToken } from "./jwt";
-import jwt from 'jsonwebtoken';
-
-const JWT_SECRET = process.env.JWT_SECRET!;
 
 const authenticateJWT = (req: Request, res: Response, next: NextFunction): void => {
     const authHeader = req.headers.authorization;

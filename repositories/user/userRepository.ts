@@ -1,9 +1,7 @@
-import pool from "../../dbConfig";
 import { User } from "../../entities/User";
-import { IUserRepository } from "../../interfaces/user/IUserRepository";
 import { UserStatus } from "../../utils/enums/UserStatus";
 import { BaseRepository } from "../base";
-const {TABLES} = require("./utils/constants");
+const {TABLES} = require("../../utils/constatnts");
 
 export class UserRepository extends BaseRepository<User> {
     // private client;

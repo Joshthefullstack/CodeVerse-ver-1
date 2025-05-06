@@ -5,7 +5,6 @@ import { UserRepository } from '../repositories/user/userRepository';
 import pool from '../dbConfig';
 import authenticateJWT from '../external-libs/authenticate';
 
-
 const router = express.Router();
 
 
@@ -17,6 +16,7 @@ router.post("/sendOtp", controller.sendOTP);
 router.post("/register", controller.createUser);
 router.post("/login", controller.loginUser);
 
+console.log(typeof authenticateJWT); // Should output 'function'
 router.use(authenticateJWT);
 
 router.put("/update-user", controller.updateUser);

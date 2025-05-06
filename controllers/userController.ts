@@ -58,12 +58,18 @@ export class UserController {
             }
 
             const retVal = await this.service.createUser(body);
-            req.session.user = retVal.value;
+            // req.session.user = retVal.value;
             // res.sendStatus(204);
 
             if (!retVal.IsValid) {
                 return sendError(res, retVal.Errors[0], 400);
             }
+
+            const token = generateToken({ user_id: body.user_id, email: body.email });
+            // res.sendStatus(204);
+
+             // 4. Send it (choose either header or cookie)
+            res.cookie('token', token, { httpOnly: true, secure: false }); // or secure: true in prod
 
             return sendSuccess(res, retVal.value, 201);
         } catch (error) {

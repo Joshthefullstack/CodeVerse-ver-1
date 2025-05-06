@@ -1,5 +1,5 @@
-const pool = require("./config/dbConfig");
-const {TABLES} = require("./utils/constants");
+import pool from './index';
+const {TABLES} = require("../utils/constatnts");
 
 
 const createTables = async () => {
@@ -13,7 +13,7 @@ const createTables = async () => {
         password_hash TEXT NOT NULL,
         avatar_url TEXT,
         bio VARCHAR(355),
-        status INT NOT NULL
+        status INT NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )`);
@@ -24,3 +24,5 @@ const createTables = async () => {
         console.log(error);
       }
     }
+
+    export default createTables;
